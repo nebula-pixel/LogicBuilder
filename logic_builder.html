@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logic → Code Builder (Any Text Mode)</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0b0b0b;
+      color: #eee;
+      padding: 20px;
+    }
+    textarea {
+      width: 45%;
+      height: 280px;
+      background: #1b1b1b;
+      color: #0f0;
+      padding: 10px;
+      border: none;
+    }
+    button, select {
+      padding: 10px;
+      margin: 8px 5px 8px 0;
+    }
+    .row {
+      display: flex;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🧠 Any-Text → Code Builder</h2>
+
+<select id="lang">
+  <option value="js">JavaScript</option>
+  <option value="py">Python</option>
+</select>
+
+<button onclick="generateCode()">Generate Code</button>
+<button onclick="saveFile()">Save Code File</button>
+
+<div class="row">
+  <textarea id="logic" placeholder="Type ANYTHING here.
+Example:
+spawn monster huggy then play ambient sound and jumpscare"></textarea>
+
+  <textarea id="output" placeholder="Generated code..." readonly></textarea>
+</div>
+
+<script>
+function generateCode() {
+  const text = document.getElementById("logic").value.toLowerCase();
+  const lang = document.getElementById("lang").value;
+  let out = "";
+
+  // MONSTER
+  if (text.includes("spawn") && text.includes("monster")) {
+    const match = text.match(/monster\s+(\w+)/);
+    const name = match ? match[1] : "unknown";
+    out += lang === "js"
+      ? `spawnMonster("${name}");\n`
+      : `spawn_monster("${name}")\n`;
+  }
+
+  // SOUND
+  if (text.includes("sound") || text.includes("music")) {
+    const match = text.match(/(ambient|scary|music)/);
+    const sound = match ? match[1] : "sound";
+    out += lang === "js"
+      ? `playSound("${sound}");\n`
+      : `play_sound("${sound}")\n`;
+  }
+
+  // MOVEMENT
+  if (text.includes("move") && text.includes("player")) {
+    out += lang === "js"
+      ? `movePlayer("forward", 5);\n`
+      : `move_player("forward", 5)\n`;
+  }
+
+  // JUMPSCARE
+  if (text.includes("jumpscare") || text.includes("scare")) {
+    out += lang === "js"
+      ? `triggerJumpscare();\n`
+      : `trigger_jumpscare()\n`;
+  }
+
+  // END GAME
+  if (text.includes("end") && text.includes("game")) {
+    out += lang === "js"
+      ? `endGame();\n`
+      : `end_game()\n`;
+  }
+
+  if (!out) {
+    out = "// No recognizable actions found.";
+  }
+
+  document.getElementById("output").value = out;
+}
+
+function saveFile() {
+  const content = document.getElementById("output").value;
+  if (!content) {
+    alert("Nothing to save!");
+    return;
+  }
+
+  const blob = new Blob([content], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "generated_code.txt";
+  link.click();
+}
+</script>
+
+</body>
+</html>
